@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MinimalApi.Models.DTOs;
+using MinimalApi.Services;
+
 
 namespace MinimalApi.Controllers
 {
@@ -6,38 +9,39 @@ namespace MinimalApi.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private static readonly List<string> Products = new()
+        private readonly IProductService _productService;
+
+        public ProductController(IProductService productService)
         {
-            "Laptop", "Mouse", "Keyboard", "Monitor"
-        };
+            _productService = productService;
+        }
+
+        [HttpPost]
+        public IActionResult AddProduct([FromBody] ProductDto productDto)
+        {
+            _productService.AddProduct(productDto);
+            return Ok(new { message = "Added!" });
+        }
 
         [HttpGet]
         public IActionResult GetAllProducts()
         {
-            return Ok(Products);
+            var products = _productService.GetAllProducts();
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
-            if (id < 0 || id > Products.Count - 1)
+            var product = _productService.GetProductById(id);
+
+            if (product == null)
             {
                 return NotFound(new { message = "Product not found!" });
             }
 
-            return Ok(Products[id]);
+            return Ok(product);
         }
 
-        [HttpPost]
-        public IActionResult AddProduct([FromBody] string product)
-        {
-            if (product == null)
-            {
-                return BadRequest(new { message = "Product cannot be empty" });
-            }
-
-            Products.Add(product);
-            return CreatedAtAction(nameof(GetProductById), new { id = Products.Count - 1 }, product);
-        }
     }
 }

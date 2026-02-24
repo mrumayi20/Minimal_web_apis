@@ -9,5 +9,9 @@ namespace MinimalApi.Services
         public List<ProductDto> GetAllProducts();
 
         public ProductDto? GetProductById(int id);
+
+        public void UpdateProduct(int id, ProductUpdateDto productUpdateDto);
+
+        public void DeleteProduct(int id);
     }
 }

@@ -48,5 +48,19 @@ namespace MinimalApi.Services
                 Price = product.Price
             };
         }
+
+        public void UpdateProduct(int id, ProductUpdateDto productUpdateDto)
+        {
+            _productRepository.UpdateProduct(id, new Product
+            {
+                Name = productUpdateDto.Name,
+                Price = productUpdateDto.Price
+            });
+        }
+
+        public void DeleteProduct(int id)
+        {
+            _productRepository.DeleteProduct(id);
+        }
     }
 }

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using MinimalApi.Data;
 using MinimalApi.Repositories;
 using MinimalApi.Services;
 
@@ -10,6 +12,11 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+//registering AppDbContext with the dependency injection container 
+//and configuring it to use SQL Server with the connection string from appsettings.json
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

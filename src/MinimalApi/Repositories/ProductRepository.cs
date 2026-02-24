@@ -1,31 +1,55 @@
+using MinimalApi.Data;
 using MinimalApi.Models.Entities;
 
 namespace MinimalApi.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private static readonly List<Product> _context = new();
+        private readonly AppDbContext _context;
 
+        public ProductRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        //_context (The DB Coordinator)
+        // Products (The DbSet)
         public void AddProduct(Product product)
         {
-            _context.Add(product);
+            _context.Products.Add(product); // SQL Server handles the ID auto-increment!
+            _context.SaveChanges();
         }
 
         public List<Product> GetAllProducts()
         {
-            return _context;
+            return _context.Products.ToList();
         }
 
         public Product? GetProductById(int id)
         {
-            if (id < 0 || id > _context.Count - 1)
+            return _context.Products.Find(id);
+        }
+
+        public void UpdateProduct(int id, Product product)
+        {
+            var oldProduct = _context.Products.Find(id);
+            if (oldProduct != null)
             {
-                return null;
+                _context.Products.Remove(oldProduct);
+                _context.Products.Add(product);
+                _context.SaveChanges();
             }
 
-            var product = _context.Where(p => p.Id == id).FirstOrDefault();
+        }
 
-            return product;
+        public void DeleteProduct(int id)
+        {
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+            }
         }
     }
 }

@@ -43,5 +43,19 @@ namespace MinimalApi.Controllers
             return Ok(product);
         }
 
+        [HttpPut("{id}")]
+        public IActionResult UpdateProduct(int id, [FromBody] ProductUpdateDto productUpdateDto)
+        {
+            _productService.UpdateProduct(id, productUpdateDto);
+            return Ok(new { message = "Updated!" });
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteProduct(int id)
+        {
+            _productService.DeleteProduct(id);
+            return Ok(new { message = "Deleted!" });
+        }
+
     }
 }

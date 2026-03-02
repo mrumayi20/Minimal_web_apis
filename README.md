@@ -63,3 +63,43 @@ dotnet add package Microsoft.EntityFrameworkCore.Tools --version 9.0.0
 
    Create the script: dotnet ef migrations add InitialCreate
    Push to SQL Server: dotnet ef database update
+
+## JWT Authentication
+
+This involves three main parts: Configuration, Token Generation, and Route Protection.
+
+### Configuration
+
+1. The library that handles JWT bearer tokens.
+
+   ```
+   dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 9.0.0
+   ```
+
+2. Configure JWT in appsettings.json
+   Add a section to hold your "Secret Key." This key is used to sign the tokens so they can't be faked.
+
+   ```
+   "Jwt": {
+   "Key": "MySuperSecretKeyThatIsAtLeast32CharactersLong!",
+   "Issuer": "https://localhost:5023",
+   "Audience": "https://localhost:5023"
+   }
+   ```
+
+3. Update Program.cs to register authorization service and authentication service as well. This registered service will check if the generated JWT token is valid or not by validating the token's signature, issuer, audience, and expiration time against the specified parameters.
+
+### Token Generation (Authentication Server)
+
+The job is `AuthController` is:
+
+1. Receive a username and password (usually via a LoginDto).
+2. Verify the user exists in your database (or a hardcoded check for now).
+3. Generate a string (the JWT) signed with the same Secret Key you put in your appsettings.json.
+4. Send that string back to the user (Postman).
+
+This controller is unique because it is the only one that should not have the [Authorize] attribute at the top, otherwise, users could never log in to get their token!
+
+### Route Protection
+
+protect your conroller with [Authorize] attribute.

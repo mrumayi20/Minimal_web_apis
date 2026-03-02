@@ -2,6 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using MinimalApi.Data;
 using MinimalApi.Repositories;
 using MinimalApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +22,24 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+//Checks if the generated JWT token is valid or not by validating the token's signature, issuer, audience, and expiration time against the specified parameters.
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +49,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+//Enabling authentication and authorization middleware in the request pipeline
+//After HttpDirection and before mapping controllers to ensure that all incoming requests are authenticated and authorized before reaching the controllers.
+app.UseAuthentication();
+app.UseAuthorization();
 
 //mapping controllers
 app.MapControllers();

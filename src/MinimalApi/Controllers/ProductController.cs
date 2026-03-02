@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinimalApi.Models.DTOs;
 using MinimalApi.Services;
@@ -5,6 +6,7 @@ using MinimalApi.Services;
 
 namespace MinimalApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase

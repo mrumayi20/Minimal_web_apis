@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using MinimalApi.Models.DTOs;
+using MinimalApi.Services;
 
 namespace MinimalApi.Controllers
 {
@@ -12,23 +13,37 @@ namespace MinimalApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
+        private readonly IUserService _userService;
 
-        public AuthController(IConfiguration config)
+        public AuthController(IConfiguration config, IUserService userService)
         {
             _config = config;
+            _userService = userService;
         }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
-            // For now, we use a simple hardcoded check. 
-            // In a real app, you would check this against your database.
-            if (loginDto.Username == "admin" && loginDto.Password == "password123")
+            if (loginDto == null)
+            {
+                return BadRequest(new { message = "Invalid client request." });
+            }
+            var user = _userService.GetUserByUsername(loginDto.Username);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+            else if (loginDto.Password != user.Password)
+            {
+                return Unauthorized(new { message = "Invalid username or password." });
+            }
+            else
             {
                 var token = GenerateJWTToken(loginDto.Username);
                 return Ok(new { token = token });
             }
 
-            return Unauthorized(new { message = "Invalid username or password." });
         }
 
         private string GenerateJWTToken(string username)

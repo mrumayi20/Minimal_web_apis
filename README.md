@@ -61,8 +61,10 @@ dotnet add package Microsoft.EntityFrameworkCore.Tools --version 9.0.0
 
 6. Create the Database (Migrations)
 
-   Create the script: dotnet ef migrations add InitialCreate
-   Push to SQL Server: dotnet ef database update
+   Create the script: `dotnet ef migrations add InitialCreate`
+   Push to SQL Server: `dotnet ef database update`
+
+   You have to create and push verytime when you ass new entity.
 
 ## JWT Authentication
 

@@ -12,6 +12,8 @@ namespace MinimalApi.Data
 
         // This creates the "Products" table in SQL Server
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<User> Users { get; set; }
     }
 }
 

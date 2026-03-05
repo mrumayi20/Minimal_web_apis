@@ -93,10 +93,10 @@ This involves three main parts: Configuration, Token Generation, and Route Prote
 
 ### Token Generation (Authentication Server)
 
-The job is `AuthController` is:
+The job of `AuthController` is:
 
 1. Receive a username and password (usually via a LoginDto).
-2. Verify the user exists in your database (or a hardcoded check for now).
+2. Verify the user exists in your database.
 3. Generate a string (the JWT) signed with the same Secret Key you put in your appsettings.json.
 4. Send that string back to the user (Postman).
 
@@ -105,3 +105,21 @@ This controller is unique because it is the only one that should not have the [A
 ### Route Protection
 
 protect your conroller with [Authorize] attribute.
+
+## Centralised Exception Handling
+
+1. Create a Global Error Response`ErrorResponseDto.cs` : define a simple DTO in your Models/DTOs folder so every error looks the same.
+
+2. Create the Global Exception Handler
+   Add a file named GlobalExceptionHandler.cs in Middleware folders.
+   The class `GlobalExceptionHandler` extends from the `IExceptionHandler`.
+
+   This class contains method `TryHandleAsync` it method gives you three objects that contain everything happening at the moment of the crash.
+
+   It takes 3 parameters `HttpContext`, `Exception`, and `CancellationToken`.
+
+   `HttpContext`: This is the "Passport" of the current request. It contains the URL the user hit, their IP address, their headers, and (most importantly) the Response object we use to send the error back.
+
+   `Exception`: This is the actual "Crime Scene Report." It contains the error message, where it happened in your code (Stack Trace), and why it happened.
+
+   `CancellationToken`: This is a signal that tells the task to stop if the user closes their browser or cancels the request while we are processing the error.

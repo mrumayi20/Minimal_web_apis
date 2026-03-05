@@ -31,6 +31,7 @@ namespace MinimalApi.Services
                                     }).ToList();
 
             return products;
+            // throw new Exception("Database is on fire!");
         }
 
         public ProductDto? GetProductById(int id)

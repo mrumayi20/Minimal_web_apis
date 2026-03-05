@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using MinimalApi.Models.Repositories;
+using MinimalApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +45,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+//Register Global Exception handler Service
+builder.Services.AddExceptionHandler<GlobalExceptionHandle>();
+builder.Services.AddProblemDetails(); //// Required for modern error handling
+
 var app = builder.Build();
+
+//Add to the pipeline (must be very early in the pipeline)
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
